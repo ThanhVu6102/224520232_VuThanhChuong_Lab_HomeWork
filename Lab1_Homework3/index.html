@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Hub - HW3</title>
+    <meta name="description" content="Resilient Event Hub with drift-free countdown and state-machine form.">
+    
+    <!-- Liên kết file CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Skip-link cho Accessibility (giống các bài trước) -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header role="banner">
+        <h1>Tech Conference 2026</h1>
+        <p class="subtitle">Join us for the biggest event of the year</p>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+
+        <!-- SECTION 1: SLICE 1 - DRIFT-FREE COUNTDOWN -->
+        <section id="countdown-section" aria-labelledby="countdown-heading">
+            <h2 id="countdown-heading">Event Starts In</h2>
+            <div id="countdown-display" class="countdown-box" aria-live="polite">
+                Loading...
+            </div>
+        </section>
+
+        <!-- SECTION 2 & 3: SLICE 2 - STATE-MACHINE FORM + SLICE 3 - SANITIZATION -->
+        <section id="registration-section" aria-labelledby="form-heading">
+            <h2 id="form-heading">Register Now</h2>
+            
+            <form id="registration-form" novalidate>
+                <div class="form-group">
+                    <label for="email-input">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email-input" 
+                        name="email" 
+                        placeholder="you@example.com" 
+                        required 
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <button type="submit" id="submit-btn">Register</button>
+                
+                <!-- Vùng hiển thị thông báo trạng thái -->
+                <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <p>&copy; 2026 Tech Conference. All rights reserved.</p>
+    </footer>
+
+    <!-- Nhúng JS theo đúng thứ tự -->
+    <script src="countdown.js"></script>
+    <script src="form.js"></script>
+</body>
+</html>
