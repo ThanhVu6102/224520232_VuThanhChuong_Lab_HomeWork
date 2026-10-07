@@ -1,0 +1,169 @@
+/* ==========================================================================
+   HW2: Drum Kit Engine - Stylesheet
+   ========================================================================== */
+
+/* 1. Định nghĩa các biến màu sắc (Design Tokens) */
+:root {
+    --bg-color: #121212;
+    --pad-bg: #2c2c2c;
+    --pad-active-bg: #00d2ff; /* Màu xanh neon khi bấm */
+    --text-color: #ffffff;
+    --text-active-color: #121212;
+    --border-color: #444444;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --record-color: #ff3333;
+    --play-color: #00cc66;
+}
+
+/* 2. CSS Reset cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 30px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* 3. Layout cho khu vực Drum Pads (Sử dụng CSS Grid) */
+.drum-pads {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 cột trên mobile */
+    gap: 15px;
+    max-width: 600px;
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+/* 4. Style cho từng nút Drum Pad */
+.pad {
+    background-color: var(--pad-bg);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.1s ease; /* Hiệu ứng nhanh khi bấm */
+    box-shadow: 0 4px 6px var(--shadow-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /* Chống bôi đen text khi bấm liên tục */
+    outline: none;
+}
+
+/* Hiệu ứng khi di chuột qua */
+.pad:hover {
+    background-color: #3a3a3a;
+    border-color: #666666;
+}
+
+/* Hiệu ứng khi nút được focus bằng bàn phím (Accessibility) */
+.pad:focus-visible {
+    outline: 3px solid var(--pad-active-bg);
+    outline-offset: 2px;
+}
+
+/* Hiệu ứng khi nút được kích hoạt (Class .active được JS thêm vào) */
+.pad.active {
+    background-color: var(--pad-active-bg);
+    color: var(--text-active-color);
+    border-color: var(--pad-active-bg);
+    transform: scale(0.95); /* Thu nhỏ nhẹ tạo cảm giác bị ấn xuống */
+    box-shadow: 0 0 15px var(--pad-active-bg); /* Hiệu ứng phát sáng */
+}
+
+/* 5. Layout cho khu vực Controls (Record/Play) */
+.controls {
+    display: flex;
+    gap: 20px;
+}
+
+.controls button {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.controls button:active {
+    transform: scale(0.95);
+}
+
+/* Nút Record */
+#record-btn {
+    background-color: #333333;
+    color: #ffffff;
+    border: 2px solid var(--record-color);
+}
+
+#record-btn:hover {
+    background-color: #444444;
+}
+
+/* Khi đang ghi âm (JS sẽ đổi màu nền thành đỏ) */
+#record-btn.recording {
+    background-color: var(--record-color);
+    color: #ffffff;
+    animation: pulse 1.5s infinite;
+}
+
+/* Nút Play */
+#play-btn {
+    background-color: #333333;
+    color: #ffffff;
+    border: 2px solid var(--play-color);
+}
+
+#play-btn:hover {
+    background-color: #444444;
+}
+
+#play-btn:active {
+    background-color: var(--play-color);
+    color: #121212;
+}
+
+/* 6. Hiệu ứng Pulse cho nút Record (Tùy chọn) */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+}
+
+/* 7. Responsive: Màn hình lớn (Desktop) */
+@media (min-width: 768px) {
+    .drum-pads {
+        grid-template-columns: repeat(4, 1fr); /* 4 cột trên desktop */
+    }
+    
+    .pad {
+        padding: 40px 20px; /* Nút to hơn trên desktop */
+        font-size: 1.5rem;
+    }
+}
