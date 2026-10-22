@@ -1,0 +1,97 @@
+:root {
+  color-scheme: dark;
+  --bg-0: #09090e;
+  --ink: #f7f5f2;
+  --muted: rgba(247, 245, 242, 0.55);
+  --shopee-orange: #ee4d2d;
+  --shopee-red: #ff2e4d;
+  --card-radius: 24px;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 520px at 12% -8%, rgba(255, 111, 0, 0.16), transparent 62%),
+    radial-gradient(900px 480px at 108% 12%, rgba(238, 45, 77, 0.14), transparent 58%),
+    var(--bg-0);
+  color: var(--ink);
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(760px, 92vw);
+  margin: 0 auto;
+  padding: 56px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  flex: 1;
+}
+
+.app-header {
+  text-align: center;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.app-header__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--shopee-orange);
+}
+
+.app-header__title {
+  font-size: clamp(2rem, 5.5vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  background: linear-gradient(92deg, #ffd166 0%, #ff7a3d 45%, var(--shopee-red) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.app-header__subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 52ch;
+}
+
+.app-stage {
+  display: flex;
+  justify-content: center;
+}
+
+.app-footer {
+  text-align: center;
+  color: rgba(247, 245, 242, 0.32);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  padding-bottom: 8px;
+}
+
