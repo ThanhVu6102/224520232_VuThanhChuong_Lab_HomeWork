@@ -1,11 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import './FlashSaleCard.css'
+import { createAntiDriftTimer } from '../utils/timer'
 
 const INITIAL_STOCK = 1
 const PRICE_VND = 5_000_000
 const ORIGINAL_PRICE_VND = 10_000_000
 const RESERVE_DELAY_MS = 1_500
 const LOCK_DURATION_MS = 300_000
+const URGENCY_THRESHOLD_MS = 60_000
 
 export type SaleState =
   | { status: 'IDLE'; stock: number }
@@ -41,6 +43,17 @@ export default function FlashSaleCard() {
         )
       }, RESERVE_DELAY_MS)
       return () => window.clearTimeout(reserveTimeout)
+    }
+
+    if (saleState.status === 'LOCKED') {
+      const stopTimer = createAntiDriftTimer(saleState.timeLeft, (remaining) => {
+        setSaleState((prev) =>
+          prev.status === 'LOCKED' && remaining > 0
+            ? { status: 'LOCKED', stock: prev.stock, timeLeft: remaining }
+            : prev,
+        )
+      })
+      return stopTimer
     }
   }, [saleState.status])
 
@@ -86,14 +99,22 @@ export default function FlashSaleCard() {
             <p className="flash-card__hint">Reserving your item… locking inventory for you.</p>
           </>
         )
-      case 'LOCKED':
+      case 'LOCKED': {
+        const holdPercent = Math.round(
+          Math.max(0, Math.min(100, (state.timeLeft / LOCK_DURATION_MS) * 100)),
+        )
         return (
           <>
             <p className="flash-card__hint">
               Inventory locked! Complete checkout before the hold runs out.
             </p>
-            <div className="countdown" role="timer">
-              {formatCountdown(LOCK_DURATION_MS)}
+            <div
+              className={`countdown${
+                state.timeLeft < URGENCY_THRESHOLD_MS ? ' countdown--urgent' : ''
+              }`}
+              role="timer"
+            >
+              {formatCountdown(state.timeLeft)}
             </div>
             <div
               className="hold-bar"
@@ -101,15 +122,16 @@ export default function FlashSaleCard() {
               aria-label="Hold time remaining"
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-valuenow={100}
+              aria-valuenow={holdPercent}
             >
-              <div className="hold-bar__fill" style={{ width: '100%' }} />
+              <div className="hold-bar__fill" style={{ width: `${holdPercent}%` }} />
             </div>
             <button className="btn btn--primary" type="button">
               Checkout
             </button>
           </>
         )
+      }
       case 'CHECKOUT':
         return (
           <>
@@ -142,7 +164,7 @@ export default function FlashSaleCard() {
     }
   }
 
-  const isUrgent = false
+  const isUrgent = saleState.status === 'LOCKED' && saleState.timeLeft < URGENCY_THRESHOLD_MS
 
   return (
     <article className={`flash-card${isUrgent ? ' flash-card--urgent' : ''}`}>
