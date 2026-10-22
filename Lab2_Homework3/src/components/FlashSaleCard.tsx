@@ -7,6 +7,7 @@ const PRICE_VND = 5_000_000
 const ORIGINAL_PRICE_VND = 10_000_000
 const RESERVE_DELAY_MS = 1_500
 const LOCK_DURATION_MS = 300_000
+const CHECKOUT_DELAY_MS = 1_200
 const URGENCY_THRESHOLD_MS = 60_000
 
 export type SaleState =
@@ -47,13 +48,21 @@ export default function FlashSaleCard() {
 
     if (saleState.status === 'LOCKED') {
       const stopTimer = createAntiDriftTimer(saleState.timeLeft, (remaining) => {
-        setSaleState((prev) =>
-          prev.status === 'LOCKED' && remaining > 0
+        setSaleState((prev) => {
+          if (prev.status !== 'LOCKED') return prev
+          return remaining > 0
             ? { status: 'LOCKED', stock: prev.stock, timeLeft: remaining }
-            : prev,
-        )
+            : { status: 'EXPIRED' }
+        })
       })
       return stopTimer
+    }
+
+    if (saleState.status === 'CHECKOUT') {
+      const checkoutTimeout = window.setTimeout(() => {
+        setSaleState((prev) => (prev.status === 'CHECKOUT' ? { status: 'SUCCESS' } : prev))
+      }, CHECKOUT_DELAY_MS)
+      return () => window.clearTimeout(checkoutTimeout)
     }
   }, [saleState.status])
 
@@ -61,6 +70,10 @@ export default function FlashSaleCard() {
     setSaleState((prev) =>
       prev.status === 'IDLE' ? { status: 'RESERVING', stock: prev.stock } : prev,
     )
+  }
+
+  const handleCheckout = () => {
+    setSaleState((prev) => (prev.status === 'LOCKED' ? { status: 'CHECKOUT' } : prev))
   }
 
   function renderStockSection(state: SaleState): ReactNode {
@@ -126,7 +139,7 @@ export default function FlashSaleCard() {
             >
               <div className="hold-bar__fill" style={{ width: `${holdPercent}%` }} />
             </div>
-            <button className="btn btn--primary" type="button">
+            <button className="btn btn--primary" type="button" onClick={handleCheckout}>
               Checkout
             </button>
           </>
