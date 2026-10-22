@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import './FlashSaleCard.css'
 
 const INITIAL_STOCK = 1
 const PRICE_VND = 5_000_000
 const ORIGINAL_PRICE_VND = 10_000_000
+const RESERVE_DELAY_MS = 1_500
 const LOCK_DURATION_MS = 300_000
 
 export type SaleState =
@@ -14,7 +15,7 @@ export type SaleState =
   | { status: 'EXPIRED' }
   | { status: 'SUCCESS' }
 
-const saleState: SaleState = { status: 'IDLE', stock: INITIAL_STOCK }
+const INITIAL_STATE: SaleState = { status: 'IDLE', stock: INITIAL_STOCK }
 
 function formatVnd(amount: number): string {
   return `${amount.toLocaleString('vi-VN')}₫`
@@ -27,99 +28,120 @@ function formatCountdown(remainingMs: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-function renderStockSection(state: SaleState): ReactNode {
-  if (state.status === 'IDLE' || state.status === 'RESERVING') {
-    return (
-      <section className="flash-card__stock" aria-label="Remaining stock">
-        <span className="flash-card__stock-label">
-          🔥 Only {state.stock} left at this price!
-        </span>
-        <div className="flash-card__stock-bar">
-          <div className="flash-card__stock-fill" />
-        </div>
-      </section>
+export default function FlashSaleCard() {
+  const [saleState, setSaleState] = useState<SaleState>(INITIAL_STATE)
+
+  useEffect(() => {
+    if (saleState.status === 'RESERVING') {
+      const reserveTimeout = window.setTimeout(() => {
+        setSaleState((prev) =>
+          prev.status === 'RESERVING'
+            ? { status: 'LOCKED', stock: prev.stock, timeLeft: LOCK_DURATION_MS }
+            : prev,
+        )
+      }, RESERVE_DELAY_MS)
+      return () => window.clearTimeout(reserveTimeout)
+    }
+  }, [saleState.status])
+
+  const handleBuyNow = () => {
+    setSaleState((prev) =>
+      prev.status === 'IDLE' ? { status: 'RESERVING', stock: prev.stock } : prev,
     )
   }
-  return null
-}
 
-function renderPanel(state: SaleState): ReactNode {
-  switch (state.status) {
-    case 'IDLE':
+  function renderStockSection(state: SaleState): ReactNode {
+    if (state.status === 'IDLE' || state.status === 'RESERVING') {
       return (
-        <>
-          <p className="flash-card__hint">
-            Grab it before someone else does — the hold only lasts 5 minutes.
-          </p>
-          <button className="btn btn--primary" type="button">
-            Buy Now
-          </button>
-        </>
-      )
-    case 'RESERVING':
-      return (
-        <>
-          <span className="spinner" aria-hidden="true" />
-          <p className="flash-card__hint">Reserving your item… locking inventory for you.</p>
-        </>
-      )
-    case 'LOCKED':
-      return (
-        <>
-          <p className="flash-card__hint">
-            Inventory locked! Complete checkout before the hold runs out.
-          </p>
-          <div className="countdown" role="timer">
-            {formatCountdown(LOCK_DURATION_MS)}
+        <section className="flash-card__stock" aria-label="Remaining stock">
+          <span className="flash-card__stock-label">
+            🔥 Only {state.stock} left at this price!
+          </span>
+          <div className="flash-card__stock-bar">
+            <div className="flash-card__stock-fill" />
           </div>
-          <div
-            className="hold-bar"
-            role="progressbar"
-            aria-label="Hold time remaining"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={100}
-          >
-            <div className="hold-bar__fill" style={{ width: '100%' }} />
-          </div>
-          <button className="btn btn--primary" type="button">
-            Checkout
-          </button>
-        </>
+        </section>
       )
-    case 'CHECKOUT':
-      return (
-        <>
-          <span className="spinner" aria-hidden="true" />
-          <p className="flash-card__hint">Processing your payment…</p>
-        </>
-      )
-    case 'EXPIRED':
-      return (
-        <>
-          <p className="flash-card__alert">Out of stock / Lock expired</p>
-          <p className="flash-card__hint">
-            The 5-minute hold ended and the inventory was released back to the pool.
-          </p>
-          <button className="btn btn--primary" type="button" disabled>
-            Buy Now
-          </button>
-        </>
-      )
-    case 'SUCCESS':
-      return (
-        <>
-          <div className="flash-card__success" aria-hidden="true">
-            ✓
-          </div>
-          <p className="flash-card__success-text">Purchase Successful!</p>
-          <p className="flash-card__hint">Order confirmed — your item ships within 24 hours.</p>
-        </>
-      )
+    }
+    return null
   }
-}
 
-export default function FlashSaleCard() {
+  function renderPanel(state: SaleState): ReactNode {
+    switch (state.status) {
+      case 'IDLE':
+        return (
+          <>
+            <p className="flash-card__hint">
+              Grab it before someone else does — the hold only lasts 5 minutes.
+            </p>
+            <button className="btn btn--primary" type="button" onClick={handleBuyNow}>
+              Buy Now
+            </button>
+          </>
+        )
+      case 'RESERVING':
+        return (
+          <>
+            <span className="spinner" aria-hidden="true" />
+            <p className="flash-card__hint">Reserving your item… locking inventory for you.</p>
+          </>
+        )
+      case 'LOCKED':
+        return (
+          <>
+            <p className="flash-card__hint">
+              Inventory locked! Complete checkout before the hold runs out.
+            </p>
+            <div className="countdown" role="timer">
+              {formatCountdown(LOCK_DURATION_MS)}
+            </div>
+            <div
+              className="hold-bar"
+              role="progressbar"
+              aria-label="Hold time remaining"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={100}
+            >
+              <div className="hold-bar__fill" style={{ width: '100%' }} />
+            </div>
+            <button className="btn btn--primary" type="button">
+              Checkout
+            </button>
+          </>
+        )
+      case 'CHECKOUT':
+        return (
+          <>
+            <span className="spinner" aria-hidden="true" />
+            <p className="flash-card__hint">Processing your payment…</p>
+          </>
+        )
+      case 'EXPIRED':
+        return (
+          <>
+            <p className="flash-card__alert">Out of stock / Lock expired</p>
+            <p className="flash-card__hint">
+              The 5-minute hold ended and the inventory was released back to the pool.
+            </p>
+            <button className="btn btn--primary" type="button" disabled>
+              Buy Now
+            </button>
+          </>
+        )
+      case 'SUCCESS':
+        return (
+          <>
+            <div className="flash-card__success" aria-hidden="true">
+              ✓
+            </div>
+            <p className="flash-card__success-text">Purchase Successful!</p>
+            <p className="flash-card__hint">Order confirmed — your item ships within 24 hours.</p>
+          </>
+        )
+    }
+  }
+
   const isUrgent = false
 
   return (
