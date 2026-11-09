@@ -1,0 +1,2 @@
+import {useState,useEffect} from 'react';import {remaining} from './model';
+export function usePubgAirdropTimer(targetEpochMs,serverOffsetMs=0){const [now,setNow]=useState(()=>Date.now()+serverOffsetMs);useEffect(()=>{const sync=()=>setNow(Date.now()+serverOffsetMs);sync();const t=setInterval(sync,200);document.addEventListener('visibilitychange',sync);return()=>{clearInterval(t);document.removeEventListener('visibilitychange',sync)}},[targetEpochMs,serverOffsetMs]);return {now,remainingMs:remaining(targetEpochMs,now)};}

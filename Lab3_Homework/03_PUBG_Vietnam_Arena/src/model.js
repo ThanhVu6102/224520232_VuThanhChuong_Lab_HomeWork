@@ -1,0 +1,5 @@
+export const remaining=(target,now=Date.now(),offset=0)=>Math.max(0,target-(now+offset));
+export function phaseOf(stock,start,end,now){return now<start?'WARMUP':now>=end?'EXPIRED':stock<=0?'LOOTED_OUT':'AIRDROP_LIVE'}
+export const squads=[{id:'te',name:'The Expendables',wwcd:4,placement:74,kills:92},{id:'ces',name:'Cerberus Esports',wwcd:3,placement:80,kills:85},{id:'roy',name:'Roy Esports',wwcd:2,placement:62,kills:76},{id:'agg',name:'AGG',wwcd:1,placement:55,kills:70}];
+export const feed=Array.from({length:240},(_,i)=>({id:'kill-'+i,squad:squads[i%4].name,text:'Player '+(i+1)+' loại đối thủ bằng '+['M416','AWM','Beryl M762'][i%3]}));
+export function mockClaim(conflict,signal){return new Promise((resolve,reject)=>{const abort=()=>{clearTimeout(t);reject(new DOMException('Aborted','AbortError'))};if(signal.aborted)return abort();const t=setTimeout(()=>{signal.removeEventListener('abort',abort);resolve({status:conflict?409:200})},850);signal.addEventListener('abort',abort,{once:true})})}

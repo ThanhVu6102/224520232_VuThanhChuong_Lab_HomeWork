@@ -1,0 +1,41 @@
+[
+  {
+    "project": "01_Studio_Drum_Kit",
+    "checks": [
+      "Click pad updates live log",
+      "Input focus isolates shortcuts",
+      "Physical keyboard triggers Snare",
+      "375px no page overflow",
+      "No runtime page errors"
+    ],
+    "axeViolations": [],
+    "errors": []
+  },
+  {
+    "project": "02_Grand_Piano_88",
+    "checks": [
+      "Render counters: only A0 key renders on note-on",
+      "Keyboard mounted",
+      "88 algorithmic keys in DOM",
+      "Recording captures note",
+      "Stop cancels playback and silences voices",
+      "375px no page overflow",
+      "No runtime page errors"
+    ],
+    "axeViolations": [],
+    "errors": []
+  },
+  {
+    "project": "03_PUBG_Vietnam_Arena",
+    "checks": [
+      "Optimistic decrement visible",
+      "409 restores stock",
+      "Same-frame duplicate click locked",
+      "Derived filter returns one squad",
+      "375px no page overflow",
+      "No runtime page errors"
+    ],
+    "axeViolations": [],
+    "errors": []
+  }
+]

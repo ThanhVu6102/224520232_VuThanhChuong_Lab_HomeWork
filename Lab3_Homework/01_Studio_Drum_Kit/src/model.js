@@ -1,0 +1,2 @@
+export const pads=[['KeyW','W','Kick',65,'sine'],['KeyA','A','Snare',185,'triangle'],['KeyS','S','Hi-hat',2100,'square'],['KeyD','D','Clap',380,'sawtooth'],['KeyJ','J','Tom low',110,'sine'],['KeyK','K','Tom high',220,'sine'],['KeyL','L','Ride',1050,'triangle']].map(([code,key,name,freq,type])=>({code,key,name,freq,type}));
+export function acceptsKey(e){return !e.repeat&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.isComposing&&!e.target?.closest?.('input,textarea,select,[contenteditable="true"]');}
